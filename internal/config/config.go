@@ -1,6 +1,7 @@
 package config
 
 var (
-	Host string = "localhost"
-	Port string = "8080"
+	Scheme string = "http://"
+	Host   string = "localhost"
+	Port   string = "8080"
 )
