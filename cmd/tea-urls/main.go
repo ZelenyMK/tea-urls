@@ -5,16 +5,22 @@ import (
 
 	"github.com/ZelenyMK/tea-urls/internal/config"
 	"github.com/ZelenyMK/tea-urls/internal/handler"
+	"github.com/ZelenyMK/tea-urls/internal/storage"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
-	log.Println(config.Scheme + config.Host + "/" + config.Port)
-	log.Println(config.Scheme + config.Host + "/" + config.Port)
-	log.Println(config.Scheme + config.Host + "/" + config.Port)
+	conn, err := storage.OpenDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer storage.CloseDB(conn)
+
+	hostURL := config.Scheme + config.Host + "/" + config.Port
+
 	linkHandler := handler.NewLinkHandler(
-		config.Scheme + config.Host + "/" + config.Port,
+		hostURL, conn,
 	)
 
 	router := gin.Default()
@@ -22,9 +28,9 @@ func main() {
 	router.POST("/links", linkHandler.Create)
 	router.GET("/:alias", linkHandler.Redirect)
 
-	log.Println("server listening on http://localhost:8080")
-
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("server listening on " + hostURL)
 }

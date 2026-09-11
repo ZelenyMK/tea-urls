@@ -1,14 +1,17 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/ZelenyMK/tea-urls/dto"
 	"github.com/ZelenyMK/tea-urls/internal/shortener"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v4"
 )
 
 type Link struct {
@@ -20,14 +23,14 @@ type Link struct {
 
 type LinkHandler struct {
 	mu         sync.RWMutex
-	links      map[string]string
+	db         *pgx.Conn
 	currentURL string
 	nextID     int64
 }
 
-func NewLinkHandler(URL string) *LinkHandler {
+func NewLinkHandler(URL string, conn *pgx.Conn) *LinkHandler {
 	return &LinkHandler{
-		links:      make(map[string]string),
+		db:         conn,
 		currentURL: strings.TrimRight(URL, "/"),
 		nextID:     1}
 }
@@ -53,7 +56,7 @@ func (h *LinkHandler) Create(c *gin.Context) {
 		})
 	}
 
-	shortenedURL, alias, err := shortener.ShortenURL(h.currentURL)
+	shortenedURL, alias, err := shortener.ShortenURL(r.URL)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "could not create shortened URL",
@@ -68,8 +71,11 @@ func (h *LinkHandler) Create(c *gin.Context) {
 		Alias:       alias,
 	})
 
-	h.links[alias] = r.URL // ToDo: replace with PostgreSQL later
+	h.mu.Lock()
+	h.db.Exec(context.Background(), "INSERT INTO links (ID, original_url, shorten_url, alias) VALUES ($1, $2, $3, $4)",
+		strconv.Itoa(int(h.nextID)), r.URL, shortenedURL, alias)
 	h.nextID++
+	h.mu.Unlock()
 }
 
 func (h *LinkHandler) Redirect(c *gin.Context) {
@@ -79,12 +85,19 @@ func (h *LinkHandler) Redirect(c *gin.Context) {
 		return
 	}
 	h.mu.RLock()
-	originalURL, ok := h.links[alias]
+	row := h.db.QueryRow(context.Background(), "SELECT original_url FROM links WHERE alias = $1", alias)
 	h.mu.RUnlock()
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "this alias is not in a database"})
+
+	var result string
+	err := row.Scan(&result)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "QueryRow failed"})
+		return
+	}
+	if result == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "got empty string"})
 		return
 	}
 
-	c.Redirect(http.StatusFound, originalURL)
+	c.Redirect(http.StatusFound, result)
 }

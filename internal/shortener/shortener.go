@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"net/url"
 
 	"crypto/md5"
 	"io"
@@ -20,20 +19,14 @@ var (
 
 func ShortenURL(currentURL string) (string, string, error) {
 	verifier := urlverifier.NewVerifier()
-	ret, errV := verifier.Verify(currentURL)
-	if errV != nil {
-		fmt.Errorf("Error: %s", errV)
+	ret, err := verifier.Verify(currentURL)
+	if err != nil {
+		fmt.Errorf("Error: %s", err)
 		return "", "", errors.New("urlverifier error")
 	}
 
 	if !ret.IsURL {
 		return "", "", errors.New("Not a valid URL")
-	}
-
-	parsedURL, errP := url.Parse(currentURL)
-	if errP != nil {
-		fmt.Errorf("Error: %s", errP)
-		return "", "", errors.New("Could not parse the URL")
 	}
 
 	h := md5.New()                                        // https://stackoverflow.com/questions/48307105/how-do-i-use-a-string-as-input-to-the-rand-seed-function-in-golang
@@ -49,9 +42,9 @@ func ShortenURL(currentURL string) (string, string, error) {
 	shortendURL := ""
 	alias := string(str)
 	if config.Host == "localhost" {
-		shortendURL = parsedURL.Scheme + "://" + config.Host + ":" + config.Port + "/" + alias
+		shortendURL = "http" + "://" + config.Host + ":" + config.Port + "/" + alias
 	} else {
-		shortendURL = parsedURL.Scheme + "://" + config.Host + "/" + alias
+		shortendURL = "http" + "://" + config.Host + "/" + alias
 	}
 
 	return shortendURL, alias, nil
