@@ -8,6 +8,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+       env: 
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+
       - name: Check out repository
         uses: actions/checkout@v4
 
