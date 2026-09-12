@@ -8,15 +8,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - env:
-          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD}}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD}}
-
       - name: Check out repository
         uses: actions/checkout@v4
 
       - name: Start Docker Compose services
         uses: hoverkraft-tech/compose-action@ee6af68587292d72db67743171809c19787df4c9 # v3.1.0
+        env:
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         with:
           compose-file: ./compose.yml
           up-flags: "--build"
