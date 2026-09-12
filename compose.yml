@@ -4,11 +4,15 @@ services:
     build: .
     environment:
       DATABASE_URL: postgres://user:123@db:5432/links?sslmode=disable
+      REDIS_PASSWORD: password
+      REDIS_URL: redis:6379
     ports:
       - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
 
   db:
     container_name: db
@@ -27,6 +31,13 @@ services:
       timeout: 5s
       retries: 10
       start_period:  10s
+  
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:
+  

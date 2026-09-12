@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
+        integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+        crossorigin="anonymous">
+    </script>
+    <title>tea-urls</title>
+
+    <style>
+        body {
+            background-color: green;
+        }
+        button {
+            background-color: black;
+            color: green
+        }
+    </style>
+
+</head>
+<body>
+    <div id="parent-div">
+        <a href="#">Link placeholder</a>
+    </div>
+
+    <form hx-post="/links"
+          hx-target="#parent-div"
+          hx-swap="innerHTML">
+
+        <label for="url">URL</label>
+        <input
+            id="url"
+            name="url"
+            type="url"
+            placeholder="https://example.com"
+            required>
+
+        <button type="submit">
+            Shorten URL
+        </button>
+    </form>
+</body>
+</html>

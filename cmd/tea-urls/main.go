@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/ZelenyMK/tea-urls/internal/config"
 	"github.com/ZelenyMK/tea-urls/internal/handler"
@@ -17,6 +18,9 @@ func main() {
 	}
 	defer storage.CloseDB(conn)
 
+	redisClient := storage.NewRedisClient()
+	defer redisClient.Close()
+
 	hostURL := config.Scheme + config.Host + "/" + config.Port
 
 	linkHandler := handler.NewLinkHandler(
@@ -25,6 +29,11 @@ func main() {
 
 	router := gin.Default()
 
+	router.LoadHTMLGlob("web/*")
+
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{})
+	})
 	router.POST("/links", linkHandler.Create)
 	router.GET("/:alias", linkHandler.Redirect)
 

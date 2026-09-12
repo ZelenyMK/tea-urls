@@ -13,6 +13,7 @@ func OpenDB() (*pgx.Conn, error) {
 		return nil, err
 	}
 	conn.Exec(context.Background(), "CREATE TABLE links (id BIGSERIAL PRIMARY KEY, original_url TEXT NOT NULL, shorten_url TEXT NOT NULL, alias TEXT NOT NULL UNIQUE)")
+	conn.Exec(context.Background(), "ALTER TABLE links ADD CONSTRAINT links_alias_unique UNIQUE (alias)")
 	return conn, nil
 }
 

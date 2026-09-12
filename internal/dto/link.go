@@ -1,7 +1,7 @@
 package dto
 
 type Request struct {
-	URL string `json:"url" binding:"required,url"`
+	URL string `form:"url"`
 }
 
 type Response struct {
