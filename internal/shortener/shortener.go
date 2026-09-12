@@ -41,7 +41,7 @@ func ShortenURL(currentURL string) (string, string, error) {
 
 	shortendURL := ""
 	alias := string(str)
-	if config.Host == "localhost" {
+	if config.Host == "localhost" || config.Host == "127.0.0.1" {
 		shortendURL = "http" + "://" + config.Host + ":" + config.Port + "/" + alias
 	} else {
 		shortendURL = "http" + "://" + config.Host + "/" + alias

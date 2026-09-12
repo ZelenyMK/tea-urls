@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/jackc/pgx/v4"
@@ -12,6 +13,8 @@ func OpenDB() (*pgx.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
+	conn.Exec(context.Background(), fmt.Sprintf("CREATE USER tea_app WITH PASSWORD '%s'", os.Getenv("POSTGRES_PASSWORD")))
+	conn.Exec(context.Background(), "CREATE DATABASE links OWNER tea_app;")
 	conn.Exec(context.Background(), "CREATE TABLE links (id BIGSERIAL PRIMARY KEY, original_url TEXT NOT NULL, shorten_url TEXT NOT NULL, alias TEXT NOT NULL UNIQUE)")
 	conn.Exec(context.Background(), "ALTER TABLE links ADD CONSTRAINT links_alias_unique UNIQUE (alias)")
 	return conn, nil

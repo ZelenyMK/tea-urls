@@ -21,7 +21,7 @@ func main() {
 	redisClient := storage.NewRedisClient()
 	defer redisClient.Close()
 
-	hostURL := config.Scheme + config.Host + "/" + config.Port
+	hostURL := config.Scheme + config.Host + ":" + config.Port
 
 	linkHandler := handler.NewLinkHandler(
 		hostURL, conn,
