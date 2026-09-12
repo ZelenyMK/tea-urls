@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ZelenyMK/tea-urls/dto"
+	"github.com/ZelenyMK/tea-urls/internal/dto"
 	"github.com/ZelenyMK/tea-urls/internal/shortener"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
