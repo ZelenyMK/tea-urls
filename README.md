@@ -17,12 +17,10 @@ A link shortening service
 1. Clone the repository:
 ```bash
 git clone https://github.com/ZelenyMK/tea-urls.git
-cd tea-urls
 ```
+and open ```tea-urls``` folder
+
 2. Create a .env file with such contents:
-```bash
-touch .env
-```
 ```
 REDIS_PASSWORD=<password>
 POSTGRES_PASSWORD=<password>
@@ -35,6 +33,14 @@ docker compose up --build
 4. Open the web interface in your browser
 ```
 http://localhost:8080/
+```
+5. Type your URL into the field
+
+Make sure to include the URL scheme (http or https)
+
+Example URL:
+```
+https://example.com/
 ```
 
 ## Stopping the service
